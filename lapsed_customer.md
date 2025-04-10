@@ -188,4 +188,73 @@ CREATE TABLE IF NOT EXISTS lapsed_customer_problem.order_items(
 -- Create indexes for order_items order_id and product_id
 CREATE INDEX idx_order_items_order_id ON lapsed_customer_problem.order_items(order_id);
 CREATE INDEX idx_order_items_product_id ON lapsed_customer_problem.order_items(product_id);
+
+-- Create a funtion to update the updated_at on all tables
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP; -- Or NOW()
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Alter customers table to have default created at and updated at trigger
+ALTER TABLE IF EXISTS lapsed_customer_problem.customers
+ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE IF EXISTS lapsed_customer_problem.customers
+ALTER COLUMN updated_at SET DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TRIGGER set_customers_updated_at_timestamp_after_update
+AFTER UPDATE ON lapsed_customer_problem.customers
+FOR EACH ROW 
+EXECUTE FUNCTION trigger_set_timestamp();
+
+-- Alter categories table to have default created at and updated at trigger
+ALTER TABLE IF EXISTS lapsed_customer_problem.categories
+ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE IF EXISTS lapsed_customer_problem.categories
+ALTER COLUMN updated_at SET DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TRIGGER set_categories_updated_at_timestamp_after_update
+AFTER UPDATE ON lapsed_customer_problem.categories
+FOR EACH ROW
+EXECUTE FUNCTION trigger_set_timestamp();
+
+-- Alter products table to have default created at and updated at trigger
+ALTER TABLE IF EXISTS lapsed_customer_problem.products
+ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE IF EXISTS lapsed_customer_problem.products
+ALTER COLUMN updated_at SET DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TRIGGER set_products_updated_at_timestamp_after_update
+AFTER UPDATE ON lapsed_customer_problem.products
+FOR EACH ROW
+EXECUTE FUNCTION trigger_set_timestamp();
+
+-- Alter orders table to have default created at and updated at trigger
+ALTER TABLE IF EXISTS lapsed_customer_problem.orders
+ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE IF EXISTS lapsed_customer_problem.orders
+ALTER COLUMN updated_at SET DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TRIGGER set_orders_updated_at_timestamp_after_update
+AFTER UPDATE ON lapsed_customer_problem.orders
+FOR EACH ROW
+EXECUTE FUNCTION trigger_set_timestamp();
+
+-- Alter order_items table to have default created at and updated at trigger
+ALTER TABLE IF EXISTS lapsed_customer_problem.order_items
+ADD COLUMN created_at timestamp without time zone not null DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE IF EXISTS lapsed_customer_problem.order_items
+ADD COLUMN updated_at timestamp without time zone not null DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TRIGGER set_order_items_updated_at_timestamp_after_update
+AFTER UPDATE ON lapsed_customer_problem.order_items
+FOR EACH ROW
+EXECUTE FUNCTION trigger_set_timestamp();
 ```
