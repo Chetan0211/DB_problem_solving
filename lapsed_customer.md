@@ -101,3 +101,91 @@ Your final PostgreSQL query. You can also add brief comments within the SQL or n
 Good luck! Take your time, think through the steps, and feel free to ask for clarification on any part of the problem description. Let me know when you have a solution ready for review. 
 
  
+
+
+## Solution:
+
+1. Creating tables
+```sql
+-- Create pgcrypto for UUID generation
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Create customer table
+CREATE TABLE IF NOT EXISTS lapsed_customer_problem.customers(
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	name character varying not null,
+	gmail character varying not null unique,
+	created_at timestamp without time zone not null,
+	updated_at timestamp without time zone not null
+);
+
+-- Create categories table
+CREATE TABLE IF NOT EXISTS lapsed_customer_problem.categories(
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	name character varying not null,
+	value character varying not null,
+	created_at timestamp without time zone not null,
+	updated_at timestamp without time zone not null
+);
+
+-- Create index for category value
+CREATE INDEX idx_categories_value ON lapsed_customer_problem.categories(value);
+
+-- Create products table
+CREATE TABLE IF NOT EXISTS lapsed_customer_problem.products(
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	name character varying not null,
+	category_id uuid,
+	unit_prize NUMERIC(10,2),
+	created_at timestamp without time zone not null,
+	updated_at timestamp without time zone not null,
+
+	CONSTRAINT fk_products_category_id
+		FOREIGN KEY (category_id) REFERENCES lapsed_customer_problem.categories(id)
+		ON DELETE SET NULL
+		ON UPDATE CASCADE
+);
+
+-- Create index for products category_id
+CREATE INDEX idx_products_category_id ON lapsed_customer_problem.products(category_id);
+
+-- Create orders table
+CREATE TABLE IF NOT EXISTS lapsed_customer_problem.orders(
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	customer_id uuid,
+	status character varying not null,
+	created_at timestamp without time zone not null,
+	updated_at timestamp without time zone not null,
+
+	CONSTRAINT fk_orders_customer_id
+		FOREIGN KEY (customer_id) REFERENCES lapsed_customer_problem.customers(id)
+		ON DELETE SET NULL
+		ON UPDATE CASCADE,
+	CONSTRAINT status_check CHECK(status IN ('completed', 'shipped', 'pending', 'ordered', 'cancelled'))
+);
+
+-- Create index for orders customer_id
+CREATE INDEX idx_orders_customer_id ON lapsed_customer_problem.orders(customer_id);
+
+-- Create order_items table
+CREATE TABLE IF NOT EXISTS lapsed_customer_problem.order_items(
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	order_id uuid,
+	product_id uuid,
+	quantity int,
+	total_product_price NUMERIC(10,2),
+
+	CONSTRAINT fk_order_items_order_id
+		FOREIGN KEY (order_id) REFERENCES lapsed_customer_problem.orders(id)
+		ON DELETE SET NULL
+		ON UPDATE CASCADE,
+	CONSTRAINT fk_order_items_product_id
+		FOREIGN KEY (product_id) REFERENCES lapsed_customer_problem.products(id)
+		ON DELETE SET NULL
+		ON UPDATE CASCADE
+);
+
+-- Create indexes for order_items order_id and product_id
+CREATE INDEX idx_order_items_order_id ON lapsed_customer_problem.order_items(order_id);
+CREATE INDEX idx_order_items_product_id ON lapsed_customer_problem.order_items(product_id);
+```
