@@ -589,4 +589,65 @@ INSERT INTO lapsed_customer_problem.order_items (order_id, product_id, quantity,
 ('34d9420f-8a49-432a-aefe-e27e9f762d90', 'fa0be483-453a-48e3-a436-5a5fed1f0836', 1, 34.99),  -- KB+Mouse (1 * 34.99)
 ('34d9420f-8a49-432a-aefe-e27e9f762d90', '29167f81-d62e-48ac-8454-4cd02300ff7a', 1, 32.95);  -- Webcam (1 * 32.95)
 
+
+-- Update created_at and updated_at for orders and order_items to resemble the 
+
+-- 1. UPDATE the 'orders' table
+UPDATE lapsed_customer_problem.orders
+SET
+    -- Generate timestamp WITHIN THE LAST 6 MONTHS
+    created_at = to_timestamp(1696953840 + (random() * 15807000))::timestamptz::timestamp, -- Explicit cast
+    -- Set updated_at similarly for consistency in this update
+    updated_at = to_timestamp(1696953840 + (random() * 15807000))::timestamptz::timestamp  -- Explicit cast
+WHERE id IN (
+    -- Paste the list of your 35 order_ids here
+    '07b445c8-3ab9-4718-86ce-b7b94a9ba45c', 'ca290a7f-0169-4b4e-99f8-e9cb92fb5ced',
+    'fde2fea9-785f-48bd-a427-7cfdf27dbf43', '35f32757-db13-4095-88ed-a63366565370',
+    '80e1b2f1-dd70-44b7-8552-fbf44c114faa', '7eb124c5-170d-41da-8c95-dc762bdd6a1a',
+    '6581bd7c-91d9-411d-845d-52d27e21e023', '057b5fb1-bb3b-4c53-8328-466ffdcf894f',
+    'eefcdc4d-65dc-45d2-8bfa-f335fd41b06f', '79c28ec7-935b-43ff-ae69-a93e08f41fb6',
+    'ae9d765f-a661-4b0d-85ee-66bd3f465a43', 'fdd20139-d1b2-4969-8fd0-5b6960e49a38',
+    '0b90a52e-c3c0-4f40-81ea-21b0c6f2bf23', '1bb89555-35b4-4b5c-9569-54ee57f66263',
+    '84c47e0c-7777-42eb-b50b-f7bd185189c6', '536db879-836c-4f0e-8038-80c91d68906b',
+    '3152a710-61a2-4fdf-9511-3ce5172aa54f', '56edd1d8-9571-46c6-990b-cd2ba73c95b0',
+    '006b0605-cda4-40e9-a881-c59617ac5199', 'ac8c11a5-21f3-4580-8138-f49715119891',
+    '64a801fb-c46c-4916-8b99-04d269be9f75', '4c58c30d-fa9b-443e-9f8b-8ccb35a91868',
+    'cc7443fe-42f8-4991-91e6-841dd984007f', 'ac4748c2-cb1e-43cb-ad89-6e608aa26e77',
+    'd22f7cc9-c4dc-4a20-81e5-0eef95e8169b', '4fb48afc-bc8d-45d6-b013-b737a915120e',
+    '73234b72-5e0b-46e9-8d4a-8cbf9c5b4217', 'b0942e2a-1b28-4e8d-8722-22013582f7a8',
+    '39b6bf78-6cb3-4087-9a03-c5ef3b0a983b', '30feceb3-ff57-44c1-a6a3-7f061f0928f1',
+    'f174e8bd-5682-4e54-8285-d9aed41701c3', '08d7691d-7553-4c72-99c3-a8f9a19a239f',
+    '54c2b8f6-67bb-427e-bef8-8906201a6f72', '6315c9b8-8a3e-4789-9780-5ecf30582fa7',
+    '34d9420f-8a49-432a-aefe-e27e9f762d90'
+);
+
+-- 2. UPDATE the 'order_items' table
+UPDATE lapsed_customer_problem.order_items
+SET
+    -- Generate timestamp WITHIN THE LAST 6 MONTHS
+    created_at = to_timestamp(1696953840 + (random() * 15807000))::timestamptz::timestamp, -- Explicit cast
+    -- Set updated_at similarly for consistency in this update
+    updated_at = to_timestamp(1696953840 + (random() * 15807000))::timestamptz::timestamp  -- Explicit cast
+WHERE order_id IN (
+    -- Paste the same list of your 35 order_ids here
+    '07b445c8-3ab9-4718-86ce-b7b94a9ba45c', 'ca290a7f-0169-4b4e-99f8-e9cb92fb5ced',
+    'fde2fea9-785f-48bd-a427-7cfdf27dbf43', '35f32757-db13-4095-88ed-a63366565370',
+    '80e1b2f1-dd70-44b7-8552-fbf44c114faa', '7eb124c5-170d-41da-8c95-dc762bdd6a1a',
+    '6581bd7c-91d9-411d-845d-52d27e21e023', '057b5fb1-bb3b-4c53-8328-466ffdcf894f',
+    'eefcdc4d-65dc-45d2-8bfa-f335fd41b06f', '79c28ec7-935b-43ff-ae69-a93e08f41fb6',
+    'ae9d765f-a661-4b0d-85ee-66bd3f465a43', 'fdd20139-d1b2-4969-8fd0-5b6960e49a38',
+    '0b90a52e-c3c0-4f40-81ea-21b0c6f2bf23', '1bb89555-35b4-4b5c-9569-54ee57f66263',
+    '84c47e0c-7777-42eb-b50b-f7bd185189c6', '536db879-836c-4f0e-8038-80c91d68906b',
+    '3152a710-61a2-4fdf-9511-3ce5172aa54f', '56edd1d8-9571-46c6-990b-cd2ba73c95b0',
+    '006b0605-cda4-40e9-a881-c59617ac5199', 'ac8c11a5-21f3-4580-8138-f49715119891',
+    '64a801fb-c46c-4916-8b99-04d269be9f75', '4c58c30d-fa9b-443e-9f8b-8ccb35a91868',
+    'cc7443fe-42f8-4991-91e6-841dd984007f', 'ac4748c2-cb1e-43cb-ad89-6e608aa26e77',
+    'd22f7cc9-c4dc-4a20-81e5-0eef95e8169b', '4fb48afc-bc8d-45d6-b013-b737a915120e',
+    '73234b72-5e0b-46e9-8d4a-8cbf9c5b4217', 'b0942e2a-1b28-4e8d-8722-22013582f7a8',
+    '39b6bf78-6cb3-4087-9a03-c5ef3b0a983b', '30feceb3-ff57-44c1-a6a3-7f061f0928f1',
+    'f174e8bd-5682-4e54-8285-d9aed41701c3', '08d7691d-7553-4c72-99c3-a8f9a19a239f',
+    '54c2b8f6-67bb-427e-bef8-8906201a6f72', '6315c9b8-8a3e-4789-9780-5ecf30582fa7',
+    '34d9420f-8a49-432a-aefe-e27e9f762d90'
+);
+
 ```
