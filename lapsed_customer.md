@@ -654,7 +654,7 @@ WHERE order_id IN (
 
 3. Solution for the problem
 
-```
+```sql
 WITH OrdersWithCompleted AS
 (
 	SELECT o.id, o.customer_id as customer_id, cus.name as name, cus.gmail as gmail, SUM(oi.total_product_price) as order_sum, o.created_at as created_at 
