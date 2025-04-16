@@ -651,3 +651,38 @@ WHERE order_id IN (
 );
 
 ```
+
+3. Solution for the problem
+
+```
+WITH OrdersWithCompleted AS
+(
+	SELECT o.id, o.customer_id as customer_id, cus.name as name, cus.gmail as gmail, SUM(oi.total_product_price) as order_sum, o.created_at as created_at 
+	FROM lapsed_customer_problem.order_items oi
+	JOIN lapsed_customer_problem.orders o ON oi.order_id = o.id
+	JOIN lapsed_customer_problem.customers cus ON o.customer_id = cus.id
+	WHERE
+	o.status = 'completed'
+	GROUP BY o.id, cus.name, cus.gmail
+),
+CompletedOrderWithTotalSumOrder AS
+(
+	SELECT SUM(order_sum) as total_sum, dat.customer_id, dat.name, dat.gmail, MAX(dat.created_at) as last_purchased_date from
+	OrdersWithCompleted dat
+	GROUP BY dat.customer_id, dat.name, dat.gmail
+	ORDER BY total_sum DESC
+),
+CountOfTotal AS
+(
+	SELECT count(*) as user_count FROM CompletedOrderWithTotalSumOrder
+),
+CompletedOrderWithTotalSumOrderWithLimit AS
+(
+	SELECT dex.customer_id, dex.name, dex.gmail, dex.total_sum, dex.last_purchased_date
+	FROM CompletedOrderWithTotalSumOrder dex
+	LIMIT CAST(CEIL((SELECT user_count FROM CountOfTotal)/10)AS INTEGER)
+)
+SELECT dex.customer_id, dex.name, dex.gmail, dex.total_sum, dex.last_purchased_date
+FROM CompletedOrderWithTotalSumOrderWithLimit dex
+WHERE dex.last_purchased_date <= NOW() - INTERVAL '6 months'
+```
